@@ -8,4 +8,5 @@ export {
   CardTitle,
 } from './card';
 export { Input } from './input';
+export { Textarea } from './textarea';
 export { Badge, badgeVariants } from './badge';
