@@ -3,29 +3,29 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Provider } from 'react-redux'
 import { Toaster } from 'react-hot-toast'
 
-import { store } from '@/store'
-import { Layout } from '@/components/layout/Layout'
-import { HomePage } from '@/pages/HomePage'
-import { GalleryPage } from '@/pages/GalleryPage'
-import { ContactPage } from '@/pages/ContactPage'
-import { BookingPage } from '@/pages/BookingPage'
-import { AdminPage } from '@/pages/AdminPage'
-import { LoginPage } from '@/pages/LoginPage'
-import { NotFoundPage } from '@/pages/NotFoundPage'
-import { ProtectedRoute } from '@/components/common/ProtectedRoute'
-import { LoadingProvider } from '@/components/common/LoadingProvider'
-import { ErrorBoundary } from '@/components/common/ErrorBoundary'
+import { store } from './store'
+import { Layout } from './components/layout/Layout'
+import { HomePage } from './pages/HomePage'
+import { GalleryPage } from './pages/GalleryPage'
+import { ContactPage } from './pages/ContactPage'
+import { BookingPage } from './pages/BookingPage'
+import { AdminPage } from './pages/AdminPage'
+import { LoginPage } from './pages/LoginPage'
+import { NotFoundPage } from './pages/NotFoundPage'
+import { ProtectedRoute } from './components/common/ProtectedRoute'
+import { LoadingProvider } from './components/common/LoadingProvider'
+import { ErrorBoundary } from './components/common/ErrorBoundary'
 
-import '@/styles/globals.css'
+import './styles/globals.css'
 
-// Create a client
+// Create a client with React Query v5 configuration
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
             retry: 3,
             retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
             staleTime: 5 * 60 * 1000, // 5 minutes
-            cacheTime: 10 * 60 * 1000, // 10 minutes
+            gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
             refetchOnWindowFocus: false,
             refetchOnReconnect: true,
         },
