@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: portfolio_postgres
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - portfolio_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d portfolio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: portfolio_backend
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/portfolio
+      - PORT=8080
+      - ENVIRONMENT=development
+      - CORS_ORIGIN=http://localhost:3000
+      - JWT_SECRET=dev-secret-key
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/vendor
+    networks:
+      - portfolio_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: portfolio_frontend
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+      - VITE_STRIPE_PUBLISHABLE_KEY=pk_test_demo
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - portfolio_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: portfolio_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./deployment/nginx.dev.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - portfolio_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  portfolio_network:
+    driver: bridge 

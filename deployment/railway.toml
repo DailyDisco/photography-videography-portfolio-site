@@ -1,0 +1,43 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[environments.production]
+  [environments.production.variables]
+    ENVIRONMENT = "production"
+    PORT = "8080"
+
+[environments.staging]
+  [environments.staging.variables]
+    ENVIRONMENT = "staging"
+    PORT = "8080"
+
+# Service configuration for backend
+[[services]]
+name = "backend"
+source = "./backend"
+[services.build]
+  builder = "DOCKERFILE"
+  dockerfilePath = "Dockerfile"
+[services.deploy]
+  healthcheckPath = "/api/health"
+  healthcheckTimeout = 300
+  restartPolicyType = "ON_FAILURE"
+
+# Service configuration for frontend  
+[[services]]
+name = "frontend"
+source = "./frontend"
+[services.build]
+  builder = "DOCKERFILE"
+  dockerfilePath = "Dockerfile"
+[services.deploy]
+  healthcheckPath = "/"
+  healthcheckTimeout = 300
+  restartPolicyType = "ON_FAILURE" 
