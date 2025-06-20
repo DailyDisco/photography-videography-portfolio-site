@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,11 +8,11 @@ export default defineConfig({
     react({
       // Enable React 19 features
       jsxImportSource: 'react',
-    })
+    }),
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {
@@ -20,6 +20,11 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/uploads': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
@@ -35,7 +40,11 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
+          ui: [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-toast',
+          ],
           animations: ['framer-motion'],
           forms: ['react-hook-form', '@hookform/resolvers', 'zod'],
           query: ['@tanstack/react-query'],
@@ -63,4 +72,4 @@ export default defineConfig({
   esbuild: {
     target: 'ES2022',
   },
-}) 
+});
