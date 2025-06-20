@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -60,7 +61,7 @@ func ParseJWT(tokenString, secret string) (*JWTClaims, error) {
 		return claims, nil
 	}
 
-	return nil, jwt.ErrTokenInvalid
+	return nil, errors.New("invalid token")
 }
 
 // RefreshToken generates a new token with extended expiration
