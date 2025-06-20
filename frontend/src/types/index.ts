@@ -7,18 +7,23 @@ export interface ApiResponse<T> {
 
 // Media Types
 export interface Media {
-  id: string;
+  id: number;
   title: string;
   description?: string;
   category: MediaCategory;
-  url: string;
+  s3_url: string;
   thumbnail_url?: string;
-  file_type: 'image' | 'video';
+  type: 'image' | 'video';
   file_size: number;
+  file_name: string;
+  mime_type: string;
   width?: number;
   height?: number;
-  views: number;
+  view_count: number;
   is_featured: boolean;
+  is_public: boolean;
+  sort_order: number;
+  uploaded_at: string;
   created_at: string;
   updated_at: string;
 }
