@@ -135,6 +135,14 @@ export const mediaAPI = {
   deleteMedia: async (id: string): Promise<void> => {
     await api.delete(`/media/${id}`);
   },
+
+  bulkDeleteMedia: async (
+    ids: string[]
+  ): Promise<{ deleted_count: number }> => {
+    const response: AxiosResponse<ApiResponse<{ deleted_count: number }>> =
+      await api.delete('/media/bulk', { data: { ids } });
+    return response.data.data;
+  },
 };
 
 // Contact API
@@ -149,8 +157,18 @@ export const contactAPI = {
     return response.data.data;
   },
 
-  markMessageAsRead: async (id: string): Promise<void> => {
-    await api.put(`/contact/messages/${id}/read`);
+  markMessageAsRead: async (id: string): Promise<ContactMessage> => {
+    const response: AxiosResponse<ApiResponse<ContactMessage>> = await api.put(
+      `/contact/messages/${id}/read`
+    );
+    return response.data.data;
+  },
+
+  markMessageAsUnread: async (id: string): Promise<ContactMessage> => {
+    const response: AxiosResponse<ApiResponse<ContactMessage>> = await api.put(
+      `/contact/messages/${id}/unread`
+    );
+    return response.data.data;
   },
 
   deleteMessage: async (id: string): Promise<void> => {
@@ -183,6 +201,66 @@ export const bookingAPI = {
         ...bookingData,
         service_id: serviceId,
       });
+    return response.data.data;
+  },
+};
+
+// Admin API
+export const adminAPI = {
+  getDashboard: async (): Promise<{
+    totalMedia: number;
+    totalMessages: number;
+    unreadMessages: number;
+    recentMessages: ContactMessage[];
+  }> => {
+    const response: AxiosResponse<
+      ApiResponse<{
+        totalMedia: number;
+        totalMessages: number;
+        unreadMessages: number;
+        recentMessages: ContactMessage[];
+      }>
+    > = await api.get('/admin/dashboard');
+    return response.data.data;
+  },
+
+  getAnalytics: async (): Promise<{
+    mediaByCategory: Record<string, number>;
+    messagesThisMonth: number;
+    popularCategories: Array<{ category: string; views: number }>;
+  }> => {
+    const response: AxiosResponse<
+      ApiResponse<{
+        mediaByCategory: Record<string, number>;
+        messagesThisMonth: number;
+        popularCategories: Array<{ category: string; views: number }>;
+      }>
+    > = await api.get('/admin/analytics');
+    return response.data.data;
+  },
+
+  getContactMessages: async (
+    page = 1,
+    limit = 10,
+    status?: 'read' | 'unread'
+  ): Promise<{
+    messages: ContactMessage[];
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  }> => {
+    const response: AxiosResponse<
+      ApiResponse<{
+        messages: ContactMessage[];
+        total: number;
+        page: number;
+        limit: number;
+        pages: number;
+      }>
+    > = await api.get('/contact/messages', {
+      params: { page, limit, status },
+    });
     return response.data.data;
   },
 };
