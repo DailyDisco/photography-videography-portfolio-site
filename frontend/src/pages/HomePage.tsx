@@ -1,13 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-// import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Camera, ArrowRight, Star, Users, Award, Clock } from 'lucide-react'
-// import { mediaAPI } from '../services/api'
+import { mediaAPI } from '../services/api'
 import { MediaCategory } from '../types'
 import { Button } from '../components/ui/button'
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-// import { Badge } from '../components/ui/badge'
 
 const categories: { name: MediaCategory; label: string; description: string }[] = [
     { name: 'portraits', label: 'Portraits', description: 'Stunning individual and group portraits' },
@@ -26,13 +24,20 @@ const stats = [
 
 export const HomePage: React.FC = () => {
     // Fetch featured media from different categories
-    // const featuredQueries = categories.slice(0, 3).map((category) =>
-    //     useQuery({
-    //         queryKey: ['media', category.name, 'featured'],
-    //         queryFn: () => mediaAPI.getMediaByCategory(category.name, 1, 3),
-    //         staleTime: 5 * 60 * 1000,
-    //     })
-    // )
+    const featuredQueries = categories.slice(0, 3).map((category) =>
+        useQuery({
+            queryKey: ['media', category.name, 'featured'],
+            queryFn: () => mediaAPI.getMediaByCategory(category.name, 1, 3),
+            staleTime: 5 * 60 * 1000,
+        })
+    )
+
+    // Get first image from first category for hero
+    const heroImageQuery = useQuery({
+        queryKey: ['media', 'hero'],
+        queryFn: () => mediaAPI.getMediaByCategory('portraits', 1, 1),
+        staleTime: 5 * 60 * 1000,
+    })
 
     return (
         <div className="min-h-screen">
@@ -70,7 +75,7 @@ export const HomePage: React.FC = () => {
                             </div>
                         </motion.div>
 
-                        {/* Hero Image Placeholder */}
+                        {/* Hero Image */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -78,12 +83,20 @@ export const HomePage: React.FC = () => {
                             className="relative"
                         >
                             <div className="aspect-[4/3] bg-gradient-to-br from-primary/20 to-accent/30 rounded-2xl overflow-hidden shadow-2xl">
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <div className="text-center">
-                                        <Camera className="w-16 h-16 mx-auto text-primary mb-4" />
-                                        <p className="text-muted-foreground">Featured Photography</p>
+                                {heroImageQuery.data?.media[0] ? (
+                                    <img
+                                        src={heroImageQuery.data.media[0].s3_url}
+                                        alt={heroImageQuery.data.media[0].title}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <div className="text-center">
+                                            <Camera className="w-16 h-16 mx-auto text-primary mb-4" />
+                                            <p className="text-muted-foreground">Featured Photography</p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                             {/* Floating elements */}
                             <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground p-3 rounded-full shadow-lg">
@@ -136,38 +149,51 @@ export const HomePage: React.FC = () => {
                     </motion.div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {categories.slice(0, 3).map((category, index) => (
-                            <motion.div
-                                key={category.name}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6, delay: index * 0.1 }}
-                            >
-                                <Link
-                                    to={`/gallery/${category.name}`}
-                                    className="group block bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
-                                >
-                                    {/* Category Image Placeholder */}
-                                    <div className="aspect-[4/3] bg-gradient-to-br from-accent/30 to-primary/20 relative overflow-hidden">
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <Camera className="w-12 h-12 text-primary/70" />
-                                        </div>
-                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                                    </div>
+                        {categories.slice(0, 3).map((category, index) => {
+                            const featuredQuery = featuredQueries[index]
+                            const featuredImage = featuredQuery?.data?.media[0]
 
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                                            {category.label}
-                                        </h3>
-                                        <p className="text-muted-foreground mb-4">{category.description}</p>
-                                        <div className="flex items-center text-primary group-hover:text-primary/80 transition-colors">
-                                            <span className="text-sm font-medium">View Gallery</span>
-                                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                            return (
+                                <motion.div
+                                    key={category.name}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                                >
+                                    <Link
+                                        to={`/gallery/${category.name}`}
+                                        className="group block bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
+                                    >
+                                        {/* Category Image */}
+                                        <div className="aspect-[4/3] bg-gradient-to-br from-accent/30 to-primary/20 relative overflow-hidden">
+                                            {featuredImage ? (
+                                                <img
+                                                    src={featuredImage.s3_url}
+                                                    alt={featuredImage.title}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <Camera className="w-12 h-12 text-primary/70" />
+                                                </div>
+                                            )}
+                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
                                         </div>
-                                    </div>
-                                </Link>
-                            </motion.div>
-                        ))}
+
+                                        <div className="p-6">
+                                            <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                                                {category.label}
+                                            </h3>
+                                            <p className="text-muted-foreground mb-4">{category.description}</p>
+                                            <div className="flex items-center text-primary group-hover:text-primary/80 transition-colors">
+                                                <span className="text-sm font-medium">View Gallery</span>
+                                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </motion.div>
+                            )
+                        })}
                     </div>
 
                     <motion.div
