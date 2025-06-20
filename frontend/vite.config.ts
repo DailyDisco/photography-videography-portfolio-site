@@ -4,7 +4,12 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      // Enable React 19 features
+      jsxImportSource: 'react',
+    })
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -22,6 +27,7 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'ES2022',
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
@@ -29,11 +35,12 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
           animations: ['framer-motion'],
           forms: ['react-hook-form', '@hookform/resolvers', 'zod'],
           query: ['@tanstack/react-query'],
           state: ['@reduxjs/toolkit', 'react-redux'],
+          utils: ['clsx', 'tailwind-merge', 'date-fns'],
         },
       },
     },
@@ -50,6 +57,10 @@ export default defineConfig({
       'react-router-dom',
       '@tanstack/react-query',
       'framer-motion',
+      'lucide-react',
     ],
+  },
+  esbuild: {
+    target: 'ES2022',
   },
 }) 
