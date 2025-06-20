@@ -15,6 +15,7 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { ProtectedRoute } from './components/common/ProtectedRoute'
 import { LoadingProvider } from './components/common/LoadingProvider'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
+import { ScrollToTop } from './components/common/ScrollToTop'
 
 import './styles/globals.css'
 
@@ -42,6 +43,7 @@ function App() {
                 <QueryClientProvider client={queryClient}>
                     <LoadingProvider>
                         <Router>
+                            <ScrollToTop />
                             <div className="min-h-screen bg-background font-sans antialiased">
                                 <Routes>
                                     {/* Public routes */}
