@@ -13,7 +13,7 @@ COPY go.mod go.sum ./
 # Download dependencies
 RUN go mod download
 
-# Copy source code
+# Copy source code (exclude frontend and other non-Go files)
 COPY . .
 
 # Build the application
@@ -35,8 +35,9 @@ WORKDIR /root/
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 
-# Create uploads directory
-RUN mkdir -p uploads && chown -R appuser:appgroup uploads
+# Create necessary directories
+RUN mkdir -p uploads static && \
+    chown -R appuser:appgroup uploads static
 
 # Change to non-root user
 USER appuser

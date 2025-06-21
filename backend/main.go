@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"photography-portfolio/config"
 	"photography-portfolio/handlers"
@@ -70,12 +71,46 @@ func main() {
 	// Rate limiting middleware
 	app.Use(middleware.RateLimit())
 
-	// Health check endpoint
+	// Health check endpoints
 	app.Get("/api/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"status":  "ok",
-			"message": "Photography Portfolio API is running",
+			"status":  "healthy",
+			"service": "photography-portfolio-backend",
 			"version": "1.0.0",
+			"timestamp": fiber.Map{
+				"unix": c.Context().Time().Unix(),
+				"iso":  c.Context().Time().Format("2006-01-02T15:04:05Z07:00"),
+			},
+		})
+	})
+	
+	app.Get("/api/ready", func(c *fiber.Ctx) error {
+		// Test database connection
+		sqlDB, err := db.DB()
+		if err != nil {
+			return c.Status(503).JSON(fiber.Map{
+				"status": "not ready",
+				"checks": fiber.Map{
+					"database": "disconnected",
+				},
+			})
+		}
+		
+		if err := sqlDB.Ping(); err != nil {
+			return c.Status(503).JSON(fiber.Map{
+				"status": "not ready", 
+				"checks": fiber.Map{
+					"database": "unreachable",
+				},
+			})
+		}
+		
+		return c.JSON(fiber.Map{
+			"status": "ready",
+			"checks": fiber.Map{
+				"database": "connected",
+				"storage":  "available",
+			},
 		})
 	})
 
@@ -133,13 +168,36 @@ func main() {
 	// Static files - serve uploaded media
 	app.Static("/uploads", "./uploads")
 
-	// 404 handler
-	app.Use(func(c *fiber.Ctx) error {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error":   "Not Found",
-			"message": "The requested resource was not found",
+	// Serve frontend static files in production
+	if cfg.Environment == "production" {
+		// Serve built frontend files
+		app.Static("/", "./static", fiber.Static{
+			Browse: false,
+			Index:  "index.html",
 		})
-	})
+		
+		// SPA fallback - serve index.html for non-API routes
+		app.Use(func(c *fiber.Ctx) error {
+			// Skip API routes
+			if strings.HasPrefix(c.Path(), "/api/") || strings.HasPrefix(c.Path(), "/uploads/") {
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"error":   "Not Found",
+					"message": "The requested resource was not found",
+				})
+			}
+			
+			// For all other routes, serve the React app
+			return c.SendFile("./static/index.html")
+		})
+	} else {
+		// Development 404 handler
+		app.Use(func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error":   "Not Found",
+				"message": "The requested resource was not found",
+			})
+		})
+	}
 
 	// Get port from environment or use default
 	port := os.Getenv("PORT")
