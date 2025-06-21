@@ -17,9 +17,20 @@ import (
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: .env file not found")
+	// Load environment variables - try different env files
+	envFiles := []string{"../env.development", ".env", "../.env"}
+	var envLoaded bool
+	
+	for _, envFile := range envFiles {
+		if err := godotenv.Load(envFile); err == nil {
+			log.Printf("✅ Loaded environment from: %s", envFile)
+			envLoaded = true
+			break
+		}
+	}
+	
+	if !envLoaded {
+		log.Println("⚠️  Warning: No environment file found, using system environment variables")
 	}
 
 	// Initialize configuration
@@ -73,6 +84,7 @@ func main() {
 	mediaHandler := handlers.NewMediaHandler(db, cfg)
 	contactHandler := handlers.NewContactHandler(db, cfg)
 	stripeHandler := handlers.NewStripeHandler(db, cfg)
+	adminHandler := handlers.NewAdminHandler(db)
 
 	// API routes
 	api := app.Group("/api")
@@ -93,6 +105,7 @@ func main() {
 	mediaAdmin.Post("/upload", mediaHandler.UploadMedia)
 	mediaAdmin.Put("/:id", mediaHandler.UpdateMedia)
 	mediaAdmin.Delete("/:id", mediaHandler.DeleteMedia)
+	mediaAdmin.Delete("/bulk", mediaHandler.BulkDeleteMedia)
 	mediaAdmin.Get("/admin/all", mediaHandler.GetAllMediaAdmin)
 
 	// Contact routes
@@ -100,25 +113,25 @@ func main() {
 	
 	// Protected contact routes (admin only)
 	contactAdmin := api.Group("/contact", middleware.AuthRequired(cfg))
-	contactAdmin.Get("/messages", contactHandler.GetMessages)
-	contactAdmin.Put("/messages/:id/read", contactHandler.MarkAsRead)
-	contactAdmin.Delete("/messages/:id", contactHandler.DeleteMessage)
+	contactAdmin.Get("/messages", adminHandler.GetContactMessages)
+	contactAdmin.Put("/messages/:id/read", adminHandler.MarkMessageAsRead)
+	contactAdmin.Put("/messages/:id/unread", adminHandler.MarkMessageAsUnread)
+	contactAdmin.Delete("/messages/:id", adminHandler.DeleteMessage)
 
 	// Stripe routes
 	stripe := api.Group("/stripe")
 	stripe.Post("/checkout", stripeHandler.CreateCheckoutSession)
 	stripe.Get("/success", stripeHandler.HandleSuccess)
+	stripe.Get("/cancel", stripeHandler.HandleCancel)
 	stripe.Post("/webhook", stripeHandler.HandleWebhook)
 
 	// Admin routes (protected)
 	admin := api.Group("/admin", middleware.AuthRequired(cfg))
-	admin.Get("/dashboard", handlers.GetDashboard)
-	admin.Get("/analytics", handlers.GetAnalytics)
+	admin.Get("/dashboard", adminHandler.GetDashboard)
+	admin.Get("/analytics", adminHandler.GetAnalytics)
 
-	// Static files (for development)
-	if cfg.Environment == "development" {
-		app.Static("/uploads", "./uploads")
-	}
+	// Static files - serve uploaded media
+	app.Static("/uploads", "./uploads")
 
 	// 404 handler
 	app.Use(func(c *fiber.Ctx) error {
