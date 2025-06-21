@@ -3,8 +3,8 @@
 
 FROM golang:1.24-alpine AS builder
 
-# Install build dependencies
-RUN apk add --no-cache git ca-certificates curl
+# Install build dependencies including Node.js
+RUN apk add --no-cache git ca-certificates curl nodejs npm
 
 # Set working directory
 WORKDIR /app
