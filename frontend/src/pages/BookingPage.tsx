@@ -13,7 +13,7 @@ import { Label } from '../components/ui/label'
 import { Textarea } from '../components/ui/textarea'
 import { Badge } from '../components/ui/badge'
 import { bookingAPI } from '../services/api'
-import type { BookingFormData, BookingService, ServiceType } from '../types'
+import type { BookingFormData, BookingService } from '../types'
 
 // Form validation schema
 const bookingSchema = z.object({
