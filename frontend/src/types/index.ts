@@ -76,39 +76,64 @@ export interface ContactFormData {
 }
 
 // Booking Types
+export type ServiceType =
+  | 'portrait'
+  | 'wedding'
+  | 'event'
+  | 'commercial'
+  | 'sports'
+  | 'nature';
+export type BookingStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'completed'
+  | 'cancelled'
+  | 'refunded';
+
 export interface BookingService {
-  id: string;
+  type: ServiceType;
   name: string;
   description: string;
-  price: number;
-  duration: number; // in minutes
+  basePrice: number;
+  pricePerHour: number;
 }
 
 export interface Booking {
-  id: string;
-  service_id: string;
-  service: BookingService;
+  id: number;
   client_name: string;
   client_email: string;
   client_phone: string;
-  preferred_date: string;
-  preferred_time: string;
+  service_type: ServiceType;
+  description?: string;
+  location?: string;
+  scheduled_date: string;
+  duration: number; // in hours
+  price: number;
+  status: BookingStatus;
   notes?: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   stripe_session_id?: string;
-  total_amount: number;
+  payment_status: string;
+  paid_at?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface BookingFormData {
-  service_id: string;
   client_name: string;
   client_email: string;
   client_phone: string;
-  preferred_date: string;
-  preferred_time: string;
-  notes?: string;
+  service_type: ServiceType;
+  description?: string | undefined;
+  location: string;
+  scheduled_date: string;
+  duration: number;
+  notes?: string | undefined;
+}
+
+export interface StripeCheckoutResponse {
+  checkout_url: string;
+  session_id: string;
+  booking_id: number;
 }
 
 // Gallery Types
