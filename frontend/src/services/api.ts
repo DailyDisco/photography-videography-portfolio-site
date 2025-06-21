@@ -11,6 +11,7 @@ import {
   BookingFormData,
   Booking,
   BookingService,
+  StripeCheckoutResponse,
   GalleryData,
 } from '../types';
 
@@ -178,30 +179,66 @@ export const contactAPI = {
 
 // Booking API
 export const bookingAPI = {
-  getServices: async (): Promise<BookingService[]> => {
-    const response: AxiosResponse<ApiResponse<BookingService[]>> =
-      await api.get('/booking/services');
-    return response.data.data;
-  },
-
-  createBooking: async (data: BookingFormData): Promise<Booking> => {
-    const response: AxiosResponse<ApiResponse<Booking>> = await api.post(
-      '/booking',
-      data
-    );
-    return response.data.data;
+  getServices: (): BookingService[] => {
+    return [
+      {
+        type: 'portrait',
+        name: 'Portrait Photography',
+        description:
+          'Professional portrait photography for individuals and families',
+        basePrice: 150,
+        pricePerHour: 150,
+      },
+      {
+        type: 'wedding',
+        name: 'Wedding Photography',
+        description: 'Complete wedding photography coverage',
+        basePrice: 300,
+        pricePerHour: 300,
+      },
+      {
+        type: 'event',
+        name: 'Event Photography',
+        description: 'Professional event and celebration photography',
+        basePrice: 200,
+        pricePerHour: 200,
+      },
+      {
+        type: 'commercial',
+        name: 'Commercial Photography',
+        description: 'Business and commercial photography services',
+        basePrice: 250,
+        pricePerHour: 250,
+      },
+      {
+        type: 'sports',
+        name: 'Sports Photography',
+        description: 'Dynamic sports and action photography',
+        basePrice: 180,
+        pricePerHour: 180,
+      },
+      {
+        type: 'nature',
+        name: 'Nature Photography',
+        description: 'Outdoor and nature photography sessions',
+        basePrice: 120,
+        pricePerHour: 120,
+      },
+    ];
   },
 
   createStripeSession: async (
-    serviceId: string,
     bookingData: BookingFormData
-  ): Promise<{ url: string }> => {
-    const response: AxiosResponse<ApiResponse<{ url: string }>> =
-      await api.post('/stripe/checkout', {
-        ...bookingData,
-        service_id: serviceId,
-      });
+  ): Promise<StripeCheckoutResponse> => {
+    const response: AxiosResponse<ApiResponse<StripeCheckoutResponse>> =
+      await api.post('/stripe/checkout', bookingData);
     return response.data.data;
+  },
+
+  getBookingSuccess: async (sessionId: string): Promise<Booking> => {
+    const response: AxiosResponse<ApiResponse<{ booking: Booking }>> =
+      await api.get(`/stripe/success?session_id=${sessionId}`);
+    return response.data.data.booking;
   },
 };
 
