@@ -40,6 +40,8 @@ services:
     volumes:
       - ./backend:/app
       - /app/vendor
+      - ./frontend/src/public/Photography App Pictures:/photos
+      - ./backend/uploads:/app/uploads
     networks:
       - portfolio_network
     restart: unless-stopped
