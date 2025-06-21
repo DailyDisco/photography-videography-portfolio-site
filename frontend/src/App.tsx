@@ -9,6 +9,8 @@ import { HomePage } from './pages/HomePage'
 import { GalleryPage } from './pages/GalleryPage'
 import { ContactPage } from './pages/ContactPage'
 import { BookingPage } from './pages/BookingPage'
+import { BookingSuccessPage } from './pages/BookingSuccessPage'
+import { BookingCancelPage } from './pages/BookingCancelPage'
 import { AdminPage } from './pages/AdminPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -52,6 +54,8 @@ function App() {
                                         <Route path="gallery/:category" element={<GalleryPage />} />
                                         <Route path="contact" element={<ContactPage />} />
                                         <Route path="booking" element={<BookingPage />} />
+                                        <Route path="booking/success" element={<BookingSuccessPage />} />
+                                        <Route path="booking/cancel" element={<BookingCancelPage />} />
                                         <Route path="login" element={<LoginPage />} />
 
                                         {/* Protected admin routes */}
