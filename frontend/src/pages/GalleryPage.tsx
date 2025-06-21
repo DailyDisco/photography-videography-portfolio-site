@@ -202,9 +202,9 @@ export const GalleryPage: React.FC = () => {
                                     onClick={() => openLightbox(image, index)}
                                 >
                                     <div className="aspect-square bg-accent/30 rounded-lg overflow-hidden">
-                                        {image.thumbnail_url || image.url ? (
+                                        {image.thumbnail_url || image.s3_url ? (
                                             <img
-                                                src={image.thumbnail_url || image.url}
+                                                src={image.thumbnail_url || image.s3_url}
                                                 alt={image.title}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                 loading="lazy"
@@ -282,7 +282,7 @@ export const GalleryPage: React.FC = () => {
                             {/* Image */}
                             <div className="bg-card rounded-lg overflow-hidden">
                                 <img
-                                    src={selectedImage.url}
+                                    src={selectedImage.s3_url}
                                     alt={selectedImage.title}
                                     className="w-full h-auto max-h-[70vh] object-contain"
                                 />
@@ -297,7 +297,7 @@ export const GalleryPage: React.FC = () => {
                                     )}
                                     <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
                                         <span>{selectedIndex + 1} of {filteredMedia.length}</span>
-                                        <span>{selectedImage.views} views</span>
+                                        <span>{selectedImage.view_count} views</span>
                                     </div>
                                 </div>
                             </div>
