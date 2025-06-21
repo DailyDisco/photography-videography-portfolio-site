@@ -25,7 +25,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 WORKDIR /app/frontend
 
 # Install Node.js dependencies and build
-RUN npm ci --only=production && npm run build
+RUN npm ci && npm run build
 
 # Final stage - create runtime container
 FROM alpine:latest
