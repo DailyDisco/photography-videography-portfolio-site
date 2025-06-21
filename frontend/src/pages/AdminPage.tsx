@@ -36,7 +36,9 @@ import {
     TableCell,
     Input,
     Badge,
-    Spinner
+    Spinner,
+    Label,
+    Textarea
 } from '../components/ui'
 import { adminAPI, contactAPI, mediaAPI } from '../services/api'
 
@@ -258,11 +260,12 @@ export const AdminPage: React.FC = () => {
 
                 {/* Main Content Tabs */}
                 <Tabs defaultValue="messages" className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                         <TabsTrigger value="messages">Messages</TabsTrigger>
                         <TabsTrigger value="media">Media</TabsTrigger>
                         <TabsTrigger value="upload">Upload</TabsTrigger>
                         <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                        <TabsTrigger value="settings">Settings</TabsTrigger>
                     </TabsList>
 
                     {/* Messages Tab */}
@@ -343,13 +346,21 @@ export const AdminPage: React.FC = () => {
                     <TabsContent value="media">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Image className="w-5 h-5" />
-                                    Media Library
-                                </CardTitle>
-                                <CardDescription>
-                                    Manage your portfolio images and videos
-                                </CardDescription>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Image className="w-5 h-5" />
+                                            Media Library
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Manage your portfolio images and videos
+                                        </CardDescription>
+                                    </div>
+                                    <Button variant="outline" className="flex items-center gap-2">
+                                        <Plus className="w-4 h-4" />
+                                        Add New
+                                    </Button>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 {isMediaLoading ? (
@@ -528,6 +539,125 @@ export const AdminPage: React.FC = () => {
                                             ))}
                                         </div>
                                     )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
+
+                    {/* Settings Tab */}
+                    <TabsContent value="settings">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Settings className="w-5 h-5" />
+                                        General Settings
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div>
+                                        <Label htmlFor="site-title">Site Title</Label>
+                                        <Input
+                                            id="site-title"
+                                            defaultValue="Photography Portfolio"
+                                            placeholder="Enter site title..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="contact-email">Contact Email</Label>
+                                        <Input
+                                            id="contact-email"
+                                            type="email"
+                                            defaultValue="contact@example.com"
+                                            placeholder="Enter contact email..."
+                                        />
+                                    </div>
+                                    <Button className="w-full">Save Settings</Button>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Calendar className="w-5 h-5" />
+                                        Booking Schedule
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div>
+                                        <Label htmlFor="booking-hours">Available Hours</Label>
+                                        <Input
+                                            id="booking-hours"
+                                            defaultValue="9:00 AM - 6:00 PM"
+                                            placeholder="Set available hours..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="advance-booking">Advance Booking (days)</Label>
+                                        <Input
+                                            id="advance-booking"
+                                            type="number"
+                                            defaultValue="7"
+                                            min="1"
+                                            placeholder="Minimum advance booking..."
+                                        />
+                                    </div>
+                                    <Button className="w-full">Update Schedule</Button>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <FileText className="w-5 h-5" />
+                                        Terms & Policies
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div>
+                                        <Label htmlFor="terms">Terms of Service</Label>
+                                        <Textarea
+                                            id="terms"
+                                            placeholder="Enter terms of service..."
+                                            className="min-h-[100px]"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="privacy">Privacy Policy</Label>
+                                        <Textarea
+                                            id="privacy"
+                                            placeholder="Enter privacy policy..."
+                                            className="min-h-[100px]"
+                                        />
+                                    </div>
+                                    <Button className="w-full">Save Policies</Button>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Plus className="w-5 h-5" />
+                                        Quick Actions
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    <Button variant="outline" className="w-full justify-start">
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Add New Gallery Category
+                                    </Button>
+                                    <Button variant="outline" className="w-full justify-start">
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Create Custom Service
+                                    </Button>
+                                    <Button variant="outline" className="w-full justify-start">
+                                        <FileText className="w-4 h-4 mr-2" />
+                                        Generate Reports
+                                    </Button>
+                                    <Button variant="outline" className="w-full justify-start">
+                                        <Calendar className="w-4 h-4 mr-2" />
+                                        Schedule Maintenance
+                                    </Button>
                                 </CardContent>
                             </Card>
                         </div>

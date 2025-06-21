@@ -206,6 +206,7 @@ export const BookingPage: React.FC = () => {
                                         </div>
                                         <p className="text-sm text-muted-foreground mt-1">
                                             {selectedService.name} • {watchedDuration} hour{watchedDuration > 1 ? 's' : ''}
+                                            {watchedServiceType && ` • ${watchedServiceType} Photography`}
                                         </p>
                                     </div>
                                 </motion.div>
