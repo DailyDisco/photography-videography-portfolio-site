@@ -61,11 +61,8 @@ COPY --from=backend-builder /app/backend/main .
 # Copy built frontend static files
 COPY --from=frontend-builder /app/frontend/dist ./static/
 
-# Copy existing photos to uploads
-COPY backend/uploads ./uploads/
-
 # Create necessary directories and set permissions
-RUN mkdir -p logs uploads/temp && \
+RUN mkdir -p logs uploads uploads/temp && \
     chown -R appuser:appgroup /app
 
 # Change to non-root user
