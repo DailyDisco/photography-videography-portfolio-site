@@ -5,6 +5,11 @@
 *.env.staging
 *.env.development
 *.env
+# Fix for env.production file (without leading dot)
+env.production
+env.staging
+env.development
+env.local
 
 # Database
 *.db
@@ -38,6 +43,18 @@ go.work.sum
 # Air live reload tool
 tmp/
 .air.toml
+
+# Build artifacts and temporary files
+temp-build
+**/temp-build
+build-*
+**/build-*
+
+# Test scripts (temporary development utilities)
+test-production-build.ps1
+test-production-build.sh
+test-*.ps1  
+test-*.sh
 
 # Frontend / Node.js
 node_modules/
